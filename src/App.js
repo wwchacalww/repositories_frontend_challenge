@@ -14,6 +14,7 @@ function App() {
       setRepositories(response.data);
     });
   }, []);
+
   async function handleAddRepository() {
     const title = document.getElementById('title_input').value;
     const url = document.getElementById('url_input').value;
@@ -45,6 +46,15 @@ function App() {
     document.getElementById('techs_input').value = "";
   }
 
+  async function handleAddLike(id){
+    const response = await api.post(`repositories/${id}/like`);
+
+    const repositoriesIndex = repositories.findIndex( repository => repository.id === id );
+    repositories[repositoriesIndex].likes = response.data.likes;
+    console.log(repositories[repositoriesIndex].likes);
+    setRepositories([...repositories]);
+  }
+
   return (
     <div>
       <ul data-testid="repository-list">
@@ -52,6 +62,8 @@ function App() {
           return (
             <li key={repository.id} >
               {repository.title}
+
+              <button onClick={() => handleAddLike(repository.id)} > ( {repository.likes} ) Likes</button>
 
               <button onClick={() => handleRemoveRepository(repository.id)}>
                 Remover
