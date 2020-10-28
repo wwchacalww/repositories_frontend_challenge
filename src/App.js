@@ -6,13 +6,28 @@ import "./styles.css";
 function App() {
   const [ repositories, setRepositories ] = useState([]);
 
+  const [ techs, setTechs ] = useState([]);
+
+
   useEffect(() => {
     api.get('repositories').then( response => {
       setRepositories(response.data);
     });
   }, []);
   async function handleAddRepository() {
-    // TODO
+    const title = document.getElementById('title_input').value;
+    const url = document.getElementById('url_input').value;
+
+    const response = await api.post('repositories', {
+      title,
+      url,
+      techs,
+      likes : 0
+    });
+    setRepositories([...repositories, response.data]);
+    document.getElementById('title_input').value = '';
+    document.getElementById('url_input').value = '';
+    setTechs([]);
   }
 
   async function handleRemoveRepository(id) {
@@ -23,6 +38,11 @@ function App() {
     repositories.splice(repositoriesIndex, 1);
 
     setRepositories([...repositories]);
+  }
+
+  function handleAddTech(){
+    setTechs([...techs, document.getElementById('techs_input').value ]);
+    document.getElementById('techs_input').value = "";
   }
 
   return (
@@ -41,7 +61,21 @@ function App() {
         })}
         
       </ul>
-
+      <p>Titulo</p>
+      <input type="text" id="title_input" /> <br />
+      <p>Url</p>
+      <input type="text" id="url_input" /> <br />
+      <p>Tecnologias</p>
+      <input type="text" id="techs_input" /> <button onClick={handleAddTech}>+</button> <br />
+      <ul>
+        { techs.length > 0 ? 
+          techs.map( tech => {
+            return ( 
+              <li key={tech}>{tech}</li>
+            )
+          })
+        : <br/> }
+      </ul>
       <button onClick={handleAddRepository}>Adicionar</button>
     </div>
   );
